@@ -1,0 +1,38 @@
+<!-- Imports polymer -->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../elements/gs-game-create.html">
+<link rel="import" href="../elements/gs-game-list.html">
+
+<!-- Defines element markup -->
+<dom-module id="gs-lobby">
+    <template>
+        <style></style>
+        <gs-game-list hidden$="[[!showList]]" on-open-crea="_onOpenCrea" on-join="_onJoin"></game-list>
+        <gs-game-create hidden$="[[showList]]" on-return="_onReturnFromCrea" on-join="_onJoin"></game-create>
+        
+    </template>
+    
+    <!-- Registers custom element -->
+    <script>
+        Polymer({
+            is: 'gs-lobby',
+        
+            properties:{
+                showList:{
+                    type:Boolean,
+                    value:true
+                }
+            },
+            _onReturnFromCrea: function(e, gameKey){
+                this.set('showList', true)
+            },
+            _onOpenCrea: function(e, gameKey){
+                this.set('showList', false)
+            },
+            _onJoin: function(e){
+                console.log(arguments, e.target.key);
+                this.fire()
+            }
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,44 @@
+<!-- Imports polymer -->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../elements/gs-lobby.html">
+<link rel="import" href="../elements/gs-game.html">
+
+<!-- Defines element markup -->
+<dom-module id="gs-app">
+    
+    <template>
+        <style></style>
+        <gs-lobby hidden$="[[!showLobby]]" on-game-key-change="_onGameKeyChange"></lobby>
+        <gs-game hidden$="[[!showGame]]" on-game-key-change="_onGameKeyChange" game-key="[[gameKey]]"></game>
+    </template>
+    
+    <!-- Registers custom element -->
+    <script>
+    Polymer({
+        is: 'gs-app',
+        properties:{
+            gameKey:{
+                type:String,
+                value:""
+            },
+            showLobby:{
+                type:Boolean,
+                computed:'_computeShowLobby(gameKey)'
+            },
+            showGame:{
+                type:Boolean,
+                computed:'_computeShowGame(gameKey)'
+            }
+        },
+        _computeShowLobby: function(){
+            return this.gameKey == "";
+        },
+        _computeShowGame: function(){
+            return this.gameKey != "";
+        },
+        _onGameKeyChange: function(e, gameKey){
+            this.set('gameKey', gameKey)
+        }
+    });
+    </script>
+</dom-module>

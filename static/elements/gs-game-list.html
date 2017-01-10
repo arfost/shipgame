@@ -1,0 +1,109 @@
+<!-- Imports polymer -->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+<!-- Defines element markup -->
+<dom-module id="gs-game-list">
+    <template>
+        <style></style>
+        <iron-ajax
+            auto
+            url="/lobby/gameList"
+            params='[[gameListParam]]'
+            handle-as="json"
+            on-response="_onGameList"
+            debounce-duration="300"
+            loading="{{loading}}"></iron-ajax>
+        <iron-ajax
+            auto
+            url="/lobby/joinGame"
+            params='[[joinGameParam]]'
+            handle-as="json"
+            on-response="_onjoinRequest"
+            debounce-duration="300"
+            loading="{{loading}}"></iron-ajax>
+        <table>
+            <tr>
+                <th>
+                    name
+                </th>
+                <th>
+                    description
+                </th>
+                <th>
+                    places
+                </th>
+                <th>
+                    statut
+                </th>
+                <th>
+                    
+                </th>
+            </tr>
+            <template is="dom-repeat" items="[[gameList]]" as="game" >
+                <tr>
+                    <td>
+                        [[game.name]]
+                    </td>
+                    <td>
+                        [[game.desc]]
+                    </td>
+                    <td>
+                        [[game.players.length]]/[[game.places]]
+                    </td>
+                    <td>
+                        [[game.statut]]
+                    </td>
+                    <td>
+                        <paper-button key="[[game.key]]" on-tap="_onJoin">Join</paper-button>
+                    </td>
+                </tr>
+            </template>
+        </table>
+        <paper-checkbox checked="{{empty}}">Hide empty</paper-checkbox>
+    </template>
+    
+    <!-- Registers custom element -->
+    <script>
+    Polymer({
+        is: 'gs-game-list',
+        properties:{
+            gameList:{
+                type:Array,
+                value:[]
+            },
+            gameListParam:{
+                type:Object,
+                computed:'_computeRequestArguments(empty)'
+            },
+            empty:{
+                type:Boolean,
+                value:false
+            }
+        },
+        _onGameList: function(e, details){
+            console.log(e);
+            this.set('gameList', details.response);
+        },
+        _computeRequestArguments: function(){
+            console.log("empty switch", this.empty);
+            return {
+                "empty":this.empty
+            }
+        },
+        _onJoin: function(e){
+            console.log(arguments, e.target.key);
+            this.fire()
+        },
+        _onjoinRequest: function(e, details){
+            if(details.response){
+                this.fire('');
+            }else{
+                this.set('error', 'Unable to join')
+            }
+        }
+    });
+    </script>
+</dom-module>
