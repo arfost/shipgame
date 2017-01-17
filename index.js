@@ -1,9 +1,13 @@
+'use strict'
+
 var express = require('express')
 var app = express()
 
 app.use('/', express.static('static'));
 
-lobby = require('./lobbyModel.js').getNewLobby();
+var game = require('./gameModel.js')
+var lobby = require('./lobbyModel.js').getNewLobby(game);
+
 
 lobby.add({
   places:5,

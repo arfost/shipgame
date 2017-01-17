@@ -4,9 +4,5 @@
         "desc",
         "players.length",
         "statut"
-    ],
-    "propToAdd":{
-        "players":[],
-        "statut":"waiting"
-    }
+    ]
 }

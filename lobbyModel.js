@@ -1,7 +1,9 @@
-defaultConfig = require("./lobbyConfig.json")
+'use strict'
 
-var getNewLobby = function(config){
-  return new Lobby(config);
+var defaultConfig = require("./lobbyConfig.json")
+
+var getNewLobby = function(game, config){
+  return new Lobby(game, config);
 }
 
 module.exports.getNewLobby = getNewLobby;
@@ -16,27 +18,29 @@ class Lobby{
       }
       this.clientGameList = [];
       this.gameList = {};
+    this.game = game;
   }
   
-  add(game){
+  add(gameOptions){
       var key = this.getNewKey();
-
+		var game = this.game.getNewGame(gameOptions);
+    	
       for(var prop in this.config.propToAdd){
           game[prop] = this.config.propToAdd[prop];
       }
 
       this.gameList[key] = game;
-      var gameClientInfo = {};
+      game.gameClientInfo = {};
 
       for(var prop of this.config.propForList){
           var result = game;
           for(var subPath of prop.split('.')){
               result = result[subPath];
           }
-          gameClientInfo[prop] = result;
+          game.gameClientInfo[prop] = result;
       }
-      gameClientInfo.key = key;
-      this.clientGameList.push(gameClientInfo);
+      game.gameClientInfo.key = key;
+      this.clientGameList.push(game.gameClientInfo);
 
       return key;
   }
@@ -55,23 +59,6 @@ class Lobby{
   getClientGameList(){
       console.log(this.clientGameList);
       return this.clientGameList;
-  }
-
-  updateGameClientInfo(key){
-      var game = this.gameList[key];
-
-      for(var gameClientInfo of this.clientGameList){
-          if(gameClientInfo.key == key){
-              for(var prop of this.config.propForList){
-                var result = game;
-                for(var key of prop.split('.')){
-                    result = result[key];
-                }
-                gameClientInfo[prop] = result;
-            }
-            break;
-          }
-      }
   }
 
   getGameDetail(key){
