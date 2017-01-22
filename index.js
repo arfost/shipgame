@@ -35,7 +35,7 @@ lobby.add({
   desc:'desc de game 5'
 });
 
-app.get('/lobby/gameList', function (req, res) {
+app.get('/lobby/gamesList', function (req, res) {
   console.log('retest', req.query);
   
   var gameToShow = [];
