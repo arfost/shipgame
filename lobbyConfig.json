@@ -2,6 +2,7 @@
     "propForList":[
         "name",
         "desc",
+        "maxPlayer",
         "players.length",
         "statut"
     ]
