@@ -26,7 +26,7 @@
     "app-pouchdb": "polymerelements/app-pouchdb#^0.9.2",
     "paper-item": "PolymerElements/paper-item#^1.2.1",
     "paper-listbox": "polymerelements/paper-listbox#^1.1.2",
-    "paper-input": "PolymerElements/paper-input#^1.1.20",
+    "paper-input": "PolymerElements/paper-input#^1.1.23",
     "paper-card": "PolymerElements/paper-card#^1.1.4",
     "paper-dialog": "PolymerElements/paper-dialog#^1.1.0",
     "neon-animation": "PolymerElements/neon-animation#^1.2.4",
@@ -34,7 +34,9 @@
     "app-layout": "PolymerElements/app-layout#^0.10.6",
     "app-route": "PolymerElements/app-route#^0.9.3",
     "iron-ajax": "PolymerElements/iron-ajax#^1.4.3",
-    "paper-checkbox": "PolymerElements/paper-checkbox#^1.4.2"
+    "paper-checkbox": "PolymerElements/paper-checkbox#^1.4.2",
+    "iron-form": "PolymerElements/iron-form#^1.1.4",
+    "paper-spinner": "PolymerElements/paper-spinner#^1.2.1"
   },
   "resolutions": {
     "font-roboto": "^1.0.1"

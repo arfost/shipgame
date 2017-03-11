@@ -8,8 +8,8 @@
     
     <template>
         <style></style>
-        <gs-lobby hidden$="[[!showLobby]]" on-game-key-change="_onGameKeyChange"></lobby>
-        <gs-game hidden$="[[!showGame]]" on-game-key-change="_onGameKeyChange" game-key="[[gameKey]]"></game>
+        <gs-lobby hidden$="[[!showLobby]]" on-join="_onGameKeyChange"></lobby>
+        <gs-game hidden$="[[showLobby]]" on-quit="_onGameKeyChange" game-key="[[gameKey]]"></game>
     </template>
     
     <!-- Registers custom element -->
@@ -23,20 +23,11 @@
             },
             showLobby:{
                 type:Boolean,
-                computed:'_computeShowLobby(gameKey)'
-            },
-            showGame:{
-                type:Boolean,
-                computed:'_computeShowGame(gameKey)'
+                value:"true"
             }
         },
-        _computeShowLobby: function(){
-            return this.gameKey == "";
-        },
-        _computeShowGame: function(){
-            return this.gameKey != "";
-        },
         _onGameKeyChange: function(e, gameKey){
+            this.set("showLobby", gameKey != "")
             this.set('gameKey', gameKey)
         }
     });

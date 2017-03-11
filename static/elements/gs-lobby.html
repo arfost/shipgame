@@ -2,14 +2,17 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../elements/gs-game-create.html">
 <link rel="import" href="../elements/gs-game-list.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 
 <!-- Defines element markup -->
 <dom-module id="gs-lobby">
     <template>
         <style></style>
-        <gs-game-list hidden$="[[!showList]]" on-open-crea="_onOpenCrea" on-join="_onJoin"></game-list>
-        <gs-game-create hidden$="[[showList]]" on-return="_onReturnFromCrea" on-join="_onJoin"></game-create>
-        
+        <div hidden$="[[!showList]]">
+            <gs-game-list></gs-game-list>
+            <paper-button raised on-tap="_openCrea">Create new game</paper-button>
+        </div>
+        <gs-game-create hidden$="[[showList]]" on-return="_onReturnFromCrea" on-join="_onJoin"></gs-game-create>
     </template>
     
     <!-- Registers custom element -->
@@ -26,12 +29,8 @@
             _onReturnFromCrea: function(e, gameKey){
                 this.set('showList', true)
             },
-            _onOpenCrea: function(e, gameKey){
+            _openCrea: function(e, gameKey){
                 this.set('showList', false)
-            },
-            _onJoin: function(e){
-                console.log(arguments, e.target.key);
-                this.fire()
             }
         });
     </script>

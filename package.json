@@ -2,14 +2,17 @@
   "name": "shipgame",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
+    "start": "node ./bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "arfost",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.17.1",
+    "cookie-session": "^2.0.0-beta.1",
     "express": "^4.14.0",
+    "morgan": "^1.8.1",
     "stealthlog": "0.0.1"
   }
 }

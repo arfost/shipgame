@@ -1,32 +1,61 @@
 <!-- Imports polymer -->
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
 
 <!-- Defines element markup -->
 <dom-module id="gs-game-create">
     <template>
         <style></style>
-        
+        <form is="iron-form" method="post" action="/lobby/createGame" id="form" on-iron-form-response="response" on-iron-form-submit="submit" on-change="change" on-iron-form-error="error">
+            <paper-input name="name" label="Name" required auto-validate></paper-input>
+            <paper-input name="desc" label="desc" equired auto-validate></paper-input>
+            <paper-input name="places" label="Places" type="number" min="2" max="10" required auto-validate></paper-input>
+            <paper-button raised on-tap="launch" disabled$="[[!valid]]" >
+                <paper-spinner id="spinner" hidden$="[[load]]"></paper-spinner>Submit
+            </paper-button>
+            <paper-button raised on-tap="_reset">Reset</paper-button>
+            <div class="output"></div>
+        </form>
     </template>
-    
+
     <!-- Registers custom element -->
     <script>
-    Polymer({
-        is: 'gs-game-create',
-    
-        // Fires when an instance of the element is created
-        created: function() {},
-    
-        // Fires when the local DOM has been fully prepared
-        ready: function() {},
-    
-        // Fires when the element was inserted into the document
-        attached: function() {},
-    
-        // Fires when the element was removed from the document
-        detached: function() {},
-    
-        // Fires when an attribute was added, removed, or updated
-        attributeChanged: function(name, type) {}
-    });
+        Polymer({
+            is: 'gs-game-create',
+            properties:{
+                load:{
+                    type:Boolean,
+                    value: false
+                },
+                valid:{
+                    type:Boolean,
+                    value: false
+                }
+            },
+            _reset: function(event) {
+                this.$.form.reset();
+            },
+            launch:function(){
+                this.$.form.submit();
+            },
+            change:function(){
+                console.log("change detected")
+                this.set('valid', this.$.form.validate())
+            },
+            submit: function(){
+                this.set('load', true);
+            },
+            response: function(e, details){
+                console.log("resultat de create : ", arguments);
+                this.set('load', false);
+                this.fire('join', details.response);
+            },
+            error: function(){
+                console.log("error : ", arguments)
+            }
+        });
     </script>
 </dom-module>

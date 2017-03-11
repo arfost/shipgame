@@ -10,7 +10,7 @@
         <style></style>
         <iron-ajax
             auto
-            url="/lobby/gameList"
+            url="/lobby/gamesList"
             params='[[gameListParam]]'
             handle-as="json"
             on-response="_onGameList"
@@ -51,7 +51,7 @@
                         [[game.desc]]
                     </td>
                     <td>
-                        [[game.players.length]]/[[game.maxPlayer]]
+                        [[game.players]]/[[game.maxPlayer]]
                     </td>
                     <td>
                         [[game.statut]]
@@ -94,12 +94,12 @@
             }
         },
         _onJoin: function(e){
-            console.log(arguments, e.target.key);
-            this.fire()
+            console.log(e.srcElement.key);
         },
         _onjoinRequest: function(e, details){
+            console.log("retour de tentative de join", e, details);
             if(details.response){
-                this.fire('');
+                //this.fire('join', details.response);
             }else{
                 this.set('error', 'Unable to join')
             }
