@@ -3,31 +3,53 @@
 
 <!-- Defines element markup -->
 <dom-module id="gs-game">
-    
+
     <template>
         <style></style>
         <div>Je suis en game </div>
     </template>
-    
+
     <!-- Registers custom element -->
     <script>
-    Polymer({
-        is: 'gs-game',
-    
-        // Fires when an instance of the element is created
-        created: function() {},
-    
-        // Fires when the local DOM has been fully prepared
-        ready: function() {},
-    
-        // Fires when the element was inserted into the document
-        attached: function() {},
-    
-        // Fires when the element was removed from the document
-        detached: function() {},
-    
-        // Fires when an attribute was added, removed, or updated
-        attributeChanged: function(name, type) {}
-    });
+        Polymer({
+            is: 'gs-game',
+
+            properties: {
+                gameKey: {
+                    type: String,
+                    value: undefined
+                },
+                playerId:{
+                    type:String,
+                    value: undefined
+                },
+                _socket: {
+                    type: Object,
+                    value: null
+                }
+            },
+            observers:[
+                '_gameIdChanged(gameKey, player)'
+            ],
+            _gameIdChanged: function () {
+                if (this._socket) {
+                    this._socket.close();
+                }
+                this._socket = new WebSocket('ws://localhost:8080');
+
+                this._socket.addEventListener('open', function (event) {
+                    this._socket.send('Hello Server!');
+                });
+
+                // Listen for messages
+                this._socket.addEventListener('message', function (event) {
+                    console.log('Message from server', event.data);
+                    this._updateGameState(event.data)
+                }.bind(this));
+            },
+            _updateGameState: function (gameState) {
+
+            }
+        });
     </script>
 </dom-module>
