@@ -17,13 +17,13 @@ wss.on('connection', function connection(ws) {
 });
 
 router.get('/gamesList', function (req, res) {
-    console.log('retest', req.query);
+    
 
     var gameToShow = [];
     var gameList = lobby.getClientRoomList();
+    console.log('nouvelle game liste demandée au server', req.query, gameList);
     for (var game in gameList) {
         if (req.query.empty == 'false' || (gameList[game]['players'] > 0)) {
-            gameList[game].key = game;
             gameToShow.push(gameList[game]);
         }
     }

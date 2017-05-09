@@ -83,7 +83,7 @@
             }
         },
         _onGameList: function(e, details){
-            console.log(e);
+            console.log("Nouvelle game list", details.response);
             this.set('gameList', details.response);
         },
         _computeRequestArguments: function(){

@@ -26,7 +26,7 @@ class Room {
       name: roomConfig.owner
     }
     this.players.length = 1;
-    this.statut = "waiting"
+    this.statut = "WAITING"
     this.propForList = propForList;
     console.log("room finie de creer avec : ", roomConfig, this.players)
   }
@@ -42,7 +42,7 @@ class Room {
   }
 
   addPlayer(playerProfil) {
-    if (this.statut == "waiting") {
+    if (this.statut == "WAITING") {
       this.players[playerProfil] = {
         name: playerProfil
       }
@@ -76,23 +76,35 @@ class Room {
 
   updateState() {
     let playersStatuts = {}
-    for (player in this.players) {
+    for (let player in this.players) {
       if (player != "length") {
         playersStatuts[this.players[player].name] = !!this.players[player].ws
       }
     }
-    for (player in this.players) {
+    for (let player in this.players) {
       if (player != "length") {
-        this.players[player].ws.send({
-          players: playersStatuts,
-          gameStat: this.game.gameStatForPlayer(player)
-        })
+        let message = "bad-status"
+        if (this.statut == "WAITING") {
+          message = "WAITING:" + (this.maxPlayer - this.players.length)
+        }
+        if (this.statut == "launched") {
+          let gameStats = this.game.gameStatForPlayer(player);
+          message = "LAUNCHED:"+JSON.stringify({
+            players: playersStatuts,
+            gameStat: gameStats
+          })
+
+        }
+
+        this.players[player].ws.send(message)
+        console.log("message socket send", player, message)
+
       }
 
     }
   }
 
-  disconnectSocket(player){
+  disconnectSocket(player) {
     this.players[player].ws = false;
     this.updateState();
   }
@@ -106,6 +118,7 @@ class Room {
     ws.on("closed", function () {
       this.disconnectSocket(player)
     })
+    this.updateState();
   }
 }
 
