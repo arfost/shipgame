@@ -50,6 +50,7 @@ class Lobby {
      * 
      */
     add(roomOptions) {
+        console.log("demande de creation de room avec : ", roomOptions)
         var key = this.getNewKey();
         var room = this.room.getNewRoom(roomOptions, this.config.propForList);
 
@@ -70,7 +71,7 @@ class Lobby {
      */
     join(key, player) {
         var room = this.roomList[key];
-        return room.addPlayer(player);
+        return room.addPlayer(player) ? room.roomClientInfo.key : false;
     }
     /**
      * 
@@ -86,6 +87,11 @@ class Lobby {
 
     getNewKey() {
         return Date.now().toString();
+    }
+
+    joinGameSocket(gameKey, player, ws){
+        console.log("joining socket for", gameKey, player, this.roomList)
+        this.roomList[gameKey].joinSocket(player, ws);
     }
 
 }

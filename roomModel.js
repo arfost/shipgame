@@ -17,13 +17,18 @@ module.exports.getNewRoom = getNewRoom;
 class Room {
 
   constructor(roomConfig, propForList) {
-    this.places = 2;
+    this.places = roomConfig.places;
     this.name = roomConfig.name;
     this.desc = roomConfig.desc;
     this.maxPlayer = roomConfig.places;
-    this.players = [roomConfig.owner];
+    this.players = {}
+    this.players[roomConfig.owner] = {
+      name: roomConfig.owner
+    }
+    this.players.length = 1;
     this.statut = "waiting"
     this.propForList = propForList;
+    console.log("room finie de creer avec : ", roomConfig, this.players)
   }
 
   updateClientInfo() {
@@ -38,7 +43,10 @@ class Room {
 
   addPlayer(playerProfil) {
     if (this.statut == "waiting") {
-      this.players.push(playerProfil);
+      this.players[playerProfil] = {
+        name: playerProfil
+      }
+      this.players.length++;
       if (this.players.length == this.maxPlayer) {
         this.statut = "launched";
         this.game = new Game({
@@ -60,6 +68,45 @@ class Room {
   removePlayer(playerProfil) {
 
   }
+
+  newMove(player, data) {
+    this.game.play(player, data)
+    this.updateState()
+  }
+
+  updateState() {
+    let playersStatuts = {}
+    for (player in this.players) {
+      if (player != "length") {
+        playersStatuts[this.players[player].name] = !!this.players[player].ws
+      }
+    }
+    for (player in this.players) {
+      if (player != "length") {
+        this.players[player].ws.send({
+          players: playersStatuts,
+          gameStat: this.game.gameStatForPlayer(player)
+        })
+      }
+
+    }
+  }
+
+  disconnectSocket(player){
+    this.players[player].ws = false;
+    this.updateState();
+  }
+
+  joinSocket(player, ws) {
+    console.log("socket join room : ", player, this.players)
+    this.players[player].ws = ws;
+    ws.on("message", function (data) {
+      this.newMove(player, data)
+    })
+    ws.on("closed", function () {
+      this.disconnectSocket(player)
+    })
+  }
 }
 
 class Game {
@@ -71,7 +118,7 @@ class Game {
       gamePlayed: 0,
       players: {}
     };
-    for (player of gameOptions.players) {
+    for (player in gameOptions.players) {
       this.score.players[player] = {
         win: 0,
         score: 0

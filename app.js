@@ -25,14 +25,13 @@ app.use('/lobby', lobby);
 
 app.get('/', function (req, res) {
   console.log('test')
-  req.session.name = "Anonymous-"+ new Date().toString();
   res.status(200).sendFile(__dirname + '/templates/index.html');
 });
 
 app.get('/name/:name', function (req, res) {
   console.log('test')
   req.session.name = req.params.name;
-  res.status(200).end("new name : "+req.params.name);
+  res.status(200).json(req.params.name);
 });
 
 // catch 404 and forward to error handler
