@@ -1,12 +1,34 @@
 <!-- Imports polymer -->
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+
 <!-- Defines element markup -->
 <dom-module id="gs-game">
 
     <template>
         <style></style>
-        <div id="gameState">Je suis en game </div>
+        <div hidden$="[[!waiting]]">Waiting for [[playerNb]] players</div>
+        <div hidden$="[[waiting]]">
+            <div style="float:left; margin:5px; border:black solid 1px">
+                <template is="dom-repeat" items="[[data.players]]" as="player">
+                    <div>[[player.name]]:[[player.statut]]</div>
+                </template>
+            </div>
+            <div>This turn, [[data.gameStat.played]] player(s) played <span hidden$="[[!played]]">and you played [[data.gameStat.selfPlay]]</span></div>
+            <div hidden$="[[played]]">
+                <paper-input name="coup" label="coup" type="number" min="1" max="100" value={{coup}}></paper-input>
+                <paper-button raised on-tap="play">
+            </div>
+            <div style="float:right; margin:5px; border:black solid 1px">
+                <div>game played : [[data.gameStat.score.gamePlayed]]</div>
+                <template is="dom-repeat" items="[[_scoreToArray(data.gameStat.score.players)]]" as="player">
+                    <div>[[player.name]] : [[player.win]]/[[player.score]]</div>
+                </template>
+            </div>
+        </div>
     </template>
 
     <!-- Registers custom element -->
@@ -19,36 +41,79 @@
                     type: String,
                     value: undefined
                 },
-                playerId:{
-                    type:String,
+                playerId: {
+                    type: String,
                     value: undefined
                 },
                 _socket: {
                     type: Object,
                     value: null
+                },
+                waiting: {
+                    type: Boolean,
+                    value: true
+                },
+                playerNb: {
+                    type: String
+                },
+                data: {
+                    type: Object
+                },
+                played: {
+                    type: Boolean,
+                    computed:'_hasPlayed(data.gameStat.selfPlay)'
                 }
             },
-            observers:[
+            observers: [
                 '_gameIdChanged(gameKey, playerId)'
             ],
             _gameIdChanged: function () {
                 if (this._socket) {
                     this._socket.close();
                 }
-                this._socket = new WebSocket('ws://localhost:26001');
+                this._socket = new WebSocket('ws://82.216.208.89:26001');
 
                 this._socket.addEventListener('open', function (event) {
-                    this._socket.send(this.gameKey+":"+this.playerId);
+                    this._socket.send(this.gameKey + ":" + this.playerId);
                 }.bind(this));
 
                 // Listen for messages
                 this._socket.addEventListener('message', function (event) {
-                    console.log('Message from server', event.data);
+                    
                     this._updateGameState(event.data)
                 }.bind(this));
             },
             _updateGameState: function (gameState) {
-                this.$.gameState.innerHTML = gameState;
+                var gameStates = gameState.split("=");
+                console.log('Message from server', event.data);
+                if (gameStates[0] == "WAITING") {
+                    this.set("waiting", true)
+                    this.set("playerNb", gameStates[1])
+                }
+                if (gameStates[0] == "LAUNCHED") {
+                    this.set("waiting", false)
+                    this.set("data", JSON.parse(gameStates[1]))
+                }
+            },
+            _scoreToArray: function (scores){
+                var array = [];
+                for(var score in this.data.gameStat.score.players){
+                    array.push({
+                        name: score,
+                        win: this.data.gameStat.score.players[score].win,
+                        score: this.data.gameStat.score.players[score].score
+                    })
+                }
+                return array;
+            },
+            _hasPlayed: function(selfPlay){
+                return selfPlay != "";
+            },
+            play: function(){
+                if(!isNaN(this.coup) && parseInt(this.coup) > 0 && parseInt(this.coup) <= 100){
+                    this._socket.send(this.coup);
+                }
+                this.set("coup", "")
             }
         });
     </script>

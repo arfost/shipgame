@@ -9,7 +9,7 @@ const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: lobby.config.port });
 
 wss.on('connection', function connection(ws) {
-  ws.on('message', function incoming(data) {
+  ws.on('message', function(data) {
       console.log("socket connection : ", data)
     var datas = data.split(":")
     lobby.joinGameSocket(datas[0], datas[1], ws)

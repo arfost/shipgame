@@ -49,8 +49,11 @@ class Room {
       this.players.length++;
       if (this.players.length == this.maxPlayer) {
         this.statut = "launched";
+        var players = Object.assign({}, this.players)
+        delete players.length
         this.game = new Game({
-          maxPlayer: this.maxPlayer
+          maxPlayer: this.maxPlayer,
+          players: players
         });
       }
       this.updateClientInfo();
@@ -70,26 +73,27 @@ class Room {
   }
 
   newMove(player, data) {
+    console.log("new play : ", player, data, this.game, this)
     this.game.play(player, data)
     this.updateState()
   }
 
   updateState() {
-    let playersStatuts = {}
+    let playersStatuts = []
     for (let player in this.players) {
       if (player != "length") {
-        playersStatuts[this.players[player].name] = !!this.players[player].ws
+        playersStatuts.push({name:this.players[player].name, statut:!!this.players[player].ws})
       }
     }
     for (let player in this.players) {
       if (player != "length") {
         let message = "bad-status"
         if (this.statut == "WAITING") {
-          message = "WAITING:" + (this.maxPlayer - this.players.length)
+          message = "WAITING=" + (this.maxPlayer - this.players.length)
         }
         if (this.statut == "launched") {
           let gameStats = this.game.gameStatForPlayer(player);
-          message = "LAUNCHED:"+JSON.stringify({
+          message = "LAUNCHED="+JSON.stringify({
             players: playersStatuts,
             gameStat: gameStats
           })
@@ -112,10 +116,11 @@ class Room {
   joinSocket(player, ws) {
     console.log("socket join room : ", player, this.players)
     this.players[player].ws = ws;
-    ws.on("message", function (data) {
+    ws.removeAllListeners('message')
+    ws.on('message', (data)=> {
       this.newMove(player, data)
     })
-    ws.on("closed", function () {
+    ws.on("closed", ()=> {
       this.disconnectSocket(player)
     })
     this.updateState();
@@ -126,12 +131,12 @@ class Game {
   constructor(gameOptions) {
     this.maxPlayer = gameOptions.maxPlayer;
     this.played = 0;
-    this.play = [];
+    this.plays = [];
     this.score = {
       gamePlayed: 0,
       players: {}
     };
-    for (player in gameOptions.players) {
+    for (var player in gameOptions.players) {
       this.score.players[player] = {
         win: 0,
         score: 0
@@ -140,14 +145,14 @@ class Game {
   }
   play(player, play) {
     this.played++;
-    this.play.push({
+    this.plays.push({
       player: player,
       play: play
     });
     if (this.played == this.maxPlayer) {
       var winner = "";
       var score = 0;
-      for (var play of this.play) {
+      for (var play of this.plays) {
         if (100 - play.play > score) {
           winner = play.player;
           score = 100 - play.play;
@@ -156,11 +161,11 @@ class Game {
       this.score.players[winner].win++;
       this.score.players[winner].score += score;
       this.lastTurn = {
-        play: JSON.stringify(JSON.parse(this.play)),
+        play: JSON.parse(JSON.stringify(this.plays)),
         winner: winner,
         score: score
       }
-      this.play = [];
+      this.plays = [];
       this.played = 0;
     }
     return true;
@@ -173,7 +178,7 @@ class Game {
     gameStat.lastTurn = this.lastTurn;
     gameStat.played = this.played;
     var selfPlay = "";
-    for (play of this.play) {
+    for (let play of this.plays) {
       if (play.player == player) {
         selfPlay = play.play;
       }
