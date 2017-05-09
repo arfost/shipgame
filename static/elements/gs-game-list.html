@@ -17,9 +17,8 @@
             debounce-duration="300"
             loading="{{loading}}"></iron-ajax>
         <iron-ajax
-            auto
+        id="join"
             url="/lobby/joinGame"
-            params='[[joinGameParam]]'
             handle-as="json"
             on-response="_onjoinRequest"
             debounce-duration="300"
@@ -94,12 +93,16 @@
             }
         },
         _onJoin: function(e){
-            console.log(e.srcElement.key);
+            console.log(this.gameList[e.srcElement.key]);
+            this.$.join.params = {
+                key: e.srcElement.key
+            };
+            this.$.join.generateRequest();
         },
         _onjoinRequest: function(e, details){
             console.log("retour de tentative de join", e, details);
             if(details.response){
-                //this.fire('join', details.response);
+                this.fire('join', details.response);
             }else{
                 this.set('error', 'Unable to join')
             }

@@ -6,7 +6,7 @@
 
     <template>
         <style></style>
-        <div>Je suis en game </div>
+        <div id="gameState">Je suis en game </div>
     </template>
 
     <!-- Registers custom element -->
@@ -29,17 +29,17 @@
                 }
             },
             observers:[
-                '_gameIdChanged(gameKey, player)'
+                '_gameIdChanged(gameKey, playerId)'
             ],
             _gameIdChanged: function () {
                 if (this._socket) {
                     this._socket.close();
                 }
-                this._socket = new WebSocket('ws://localhost:8080');
+                this._socket = new WebSocket('ws://localhost:26001');
 
                 this._socket.addEventListener('open', function (event) {
-                    this._socket.send('Hello Server!');
-                });
+                    this._socket.send(this.gameKey+":"+this.playerId);
+                }.bind(this));
 
                 // Listen for messages
                 this._socket.addEventListener('message', function (event) {
@@ -48,7 +48,7 @@
                 }.bind(this));
             },
             _updateGameState: function (gameState) {
-
+                this.$.gameState.innerHTML = gameState;
             }
         });
     </script>

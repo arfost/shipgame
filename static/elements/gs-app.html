@@ -2,14 +2,25 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../elements/gs-lobby.html">
 <link rel="import" href="../elements/gs-game.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 
 <!-- Defines element markup -->
 <dom-module id="gs-app">
     
     <template>
         <style></style>
-        <gs-lobby hidden$="[[!showLobby]]" on-join="_onGameKeyChange"></lobby>
-        <gs-game hidden$="[[showLobby]]" on-quit="_onGameKeyChange" game-key="[[gameKey]]"></game>
+        <iron-ajax
+        id="player"
+            url="/name/[[name]]"
+            handle-as="json"
+            on-response="_onNameInfo"
+            debounce-duration="300"
+            loading="{{loading}}"></iron-ajax>
+        <div><paper-input label="text input" value="{{name}}" id="newName"></paper-input><paper-button raised class="indigo" on-tap="changeName">Change name</paper-button></div>
+        <gs-lobby hidden$="[[!showLobby]]" on-join="_onGameKeyChange"></gs-lobby>
+        <gs-game hidden$="[[showLobby]]" on-quit="_onGameKeyChange" game-key="[[gameKey]]" player-id="[[name]]"></gs-game>
     </template>
     
     <!-- Registers custom element -->
@@ -18,17 +29,33 @@
         is: 'gs-app',
         properties:{
             gameKey:{
-                type:String,
-                value:""
+                type:String
             },
             showLobby:{
                 type:Boolean,
                 value:"true"
+            },
+            name: {
+                type:String
             }
         },
         _onGameKeyChange: function(e, gameKey){
-            this.set("showLobby", gameKey != "")
+            console.log("room joined, gamekey", gameKey, gameKey == "")
+            this.set("showLobby", gameKey == "")
             this.set('gameKey', gameKey)
+        },
+        attached: function(){
+            console.log("i'm attached")
+            this.set('name', "Anonymous-"+ Date.now())
+            this.$.player.generateRequest()
+        },
+        changeName: function(){
+            console.log("i'm attached")
+            
+            this.$.player.generateRequest()
+        },
+        _onNameInfo: function(e, details){
+            console.log("new Name received", details.response, this.name)
         }
     });
     </script>
